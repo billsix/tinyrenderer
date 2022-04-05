@@ -21,4 +21,4 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 install(DIRECTORY obj DESTINATION share/)
-install(DIRECTORY obj DESTINATION /)
+install(DIRECTORY obj DESTINATION .)
