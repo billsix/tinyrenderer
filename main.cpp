@@ -1,6 +1,7 @@
 #include <limits>
 #include "model.h"
 #include "our_gl.h"
+#include "config.h"
 
 constexpr int width  = 800; // output image size
 constexpr int height = 800;
@@ -56,10 +57,20 @@ struct Shader : IShader {
 };
 
 int main(int argc, char** argv) {
-    if (2>argc) {
-        std::cerr << "Usage: " << argv[0] << " obj/model.obj" << std::endl;
-        return 1;
+    std::string resourcePath = std::string(RESOURCE_PATH) + "/obj/diablo3_pose/diablo3_pose.obj";
+    char* defaultArg2 = const_cast<char*>(resourcePath.c_str());
+    
+    char* defaultargs[] = {argv[0], defaultArg2};
+    char** newargv;
+    if (2 > argc) {
+      newargv = defaultargs;
+      argc = 2;
     }
+    else
+      {
+        newargv = argv;
+      }
+
     TGAImage framebuffer(width, height, TGAImage::RGB); // the output image
     lookat(eye, center, up);                            // build the ModelView matrix
     viewport(width/8, height/8, width*3/4, height*3/4); // build the Viewport matrix
@@ -67,7 +78,7 @@ int main(int argc, char** argv) {
     std::vector<double> zbuffer(width*height, std::numeric_limits<double>::max());
 
     for (int m=1; m<argc; m++) { // iterate through all input objects
-        Model model(argv[m]);
+        Model model(newargv[m]);
         Shader shader(model);
         for (int i=0; i<model.nfaces(); i++) { // for every triangle
             vec4 clip_vert[3]; // triangle coordinates (clip coordinates), written by VS, read by FS
@@ -79,4 +90,3 @@ int main(int argc, char** argv) {
     framebuffer.write_tga_file("framebuffer.tga");
     return 0;
 }
-
